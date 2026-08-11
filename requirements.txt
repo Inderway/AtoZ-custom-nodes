@@ -1,0 +1,15 @@
+# AtoZ-custom-nodes 依赖清单
+#
+# 规范：
+# 1. 只列出节点代码中 import 的第三方包（非标准库、非 ComfyUI 自带）
+# 2. ComfyUI 运行时自带的依赖（torch、numpy、Pillow 等）不写入
+# 3. 标准库（os、re、glob、ast 等）不写入
+# 4. 新增节点引入新依赖时，同步在此文件追加
+#
+# 示例：
+# 节点中使用了 cv2       -> 添加 opencv-python
+# 节点中使用了 PIL       -> 不添加（ComfyUI 自带）
+# 节点中使用了 requests  -> 添加 requests
+
+# downscale_image_threshold.py
+opencv-python
