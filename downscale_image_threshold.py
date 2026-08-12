@@ -1,6 +1,7 @@
 """Downscale Image (threshold)
 
-接受大尺寸图片，将其等比缩小至指定尺寸；未超过指定尺寸的图片原样输出。
+接受大尺寸图片，将其等比缩小至指定长边和短边尺寸；未超过指定尺寸的图片原样输出。
+横图以 long 为宽、short 为高，竖图以 short 为宽、long 为高。
 缩小后不足画布的区域以边缘像素扩展填充并模糊化，实现平滑自然的过渡效果。
 """
 
@@ -20,8 +21,8 @@ class DownscaleImageThreshold:
         return {
             "required": {
                 "image": ("IMAGE",),
-                "width": ("INT", {"default": 2560, "min": 16, "max": 16384, "step": 8}),
-                "height": ("INT", {"default": 1920, "min": 16, "max": 16384, "step": 8}),
+                "long": ("INT", {"default": 2560, "min": 16, "max": 16384, "step": 8}),
+                "short": ("INT", {"default": 1920, "min": 16, "max": 16384, "step": 8}),
             },
         }
 
@@ -30,10 +31,16 @@ class DownscaleImageThreshold:
 
     FUNCTION = "process"
 
-    def process(self, image, width, height):
+    def process(self, image, long, short):
         # 阈值判断：宽高均未超出目标尺寸，原样返回，不做转换避免精度损失
         h, w = image.shape[1], image.shape[2]
-        if w <= width and h <= height:
+        # 根据图片宽高对比决定目标尺寸：宽>高为横图，宽<高为竖图
+        if w > h:
+            target_w, target_h = long, short
+        else:
+            target_w, target_h = short, long
+
+        if w <= target_w and h <= target_h:
             return (image,)
 
         # tensor [0,1] float32 -> numpy uint8
@@ -41,18 +48,18 @@ class DownscaleImageThreshold:
         h, w = img.shape[:2]
 
         # 等比缩小以完整放入目标画布
-        scale = min(width / w, height / h)
+        scale = min(target_w / w, target_h / h)
         new_w = int(round(w * scale))
         new_h = int(round(h * scale))
         resized_img = cv2.resize(img, (new_w, new_h), interpolation=cv2.INTER_LANCZOS4)
 
         # 比例吻合时直接输出
-        if new_w == width and new_h == height:
+        if new_w == target_w and new_h == target_h:
             return (self._to_tensor(resized_img),)
 
         # 居中计算 padding 边距
-        pad_w = width - new_w
-        pad_h = height - new_h
+        pad_w = target_w - new_w
+        pad_h = target_h - new_h
         pad_top = pad_h // 2
         pad_bottom = pad_h - pad_top
         pad_left = pad_w // 2
@@ -69,7 +76,7 @@ class DownscaleImageThreshold:
 
         # 原图区域遮罩（原图为1，填充区为0），高斯模糊实现羽化过渡
         feather_dist = 15
-        mask = np.zeros((height, width), dtype=np.float32)
+        mask = np.zeros((target_h, target_w), dtype=np.float32)
         mask[pad_top:pad_top + new_h, pad_left:pad_left + new_w] = 1.0
         mask = cv2.GaussianBlur(mask, (feather_dist * 2 + 1, feather_dist * 2 + 1), 0)
 
