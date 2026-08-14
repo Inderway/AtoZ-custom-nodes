@@ -26,8 +26,8 @@ class DownscaleImageThreshold:
             },
         }
 
-    RETURN_TYPES = ("IMAGE",)
-    RETURN_NAMES = ("image",)
+    RETURN_TYPES = ("IMAGE", "INT", "INT")
+    RETURN_NAMES = ("image", "width", "height")
 
     FUNCTION = "process"
 
@@ -41,7 +41,7 @@ class DownscaleImageThreshold:
             target_w, target_h = short, long
 
         if w <= target_w and h <= target_h:
-            return (image,)
+            return (image, w, h)
 
         # tensor [0,1] float32 -> numpy uint8
         img = np.clip(255. * image[0].cpu().numpy(), 0, 255).astype(np.uint8)
@@ -55,7 +55,7 @@ class DownscaleImageThreshold:
 
         # 比例吻合时直接输出
         if new_w == target_w and new_h == target_h:
-            return (self._to_tensor(resized_img),)
+            return (self._to_tensor(resized_img), new_w, new_h)
 
         # 居中计算 padding 边距
         pad_w = target_w - new_w
@@ -89,7 +89,7 @@ class DownscaleImageThreshold:
             blurred_background.astype(np.float32) * (1.0 - mask)
         ).astype(np.uint8)
 
-        return (self._to_tensor(final_img),)
+        return (self._to_tensor(final_img), target_w, target_h)
 
     @staticmethod
     def _to_tensor(img):
