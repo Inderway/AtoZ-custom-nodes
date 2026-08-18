@@ -29,6 +29,7 @@ AtoZ-custom-nodes/
 | 节点 | 说明 |
 |------|------|
 | Downscale Image (threshold) | 将大尺寸图片等比缩小至指定尺寸（默认 2560x1920）；未超过指定尺寸的图片原样输出；缩放的不足区域以边缘像素填充并模糊化，过渡平滑 |
+| Reset Resolution by Longer Edge | 根据输入图片朝向重置给定的宽高分配：竖图（高>宽）时交换给定的 width/height，横图时原样输出；用于按图片长边分配分辨率 |
 | Load Image (index) | 按索引读取指定文件夹内的图片，排序与 Windows 按名称排序一致（自然排序，如 2.jpg 排在 10.jpg 前）；支持 jpg/jpeg/bmp/webp/png；索引越界抛出错误 |
 | Prompt Selector | 按索引读取指定文件夹内的 txt 文件并输出文本（UTF-8 优先，GBK 回退）；自然排序；索引越界抛出错误 |
 | File Selector | 按索引读取指定文件夹内指定格式的文件路径（format 逗号分隔多格式，空串不过滤）；仅统计匹配格式的文件，索引只在该范围内取值；自然排序；索引越界抛出错误 |
