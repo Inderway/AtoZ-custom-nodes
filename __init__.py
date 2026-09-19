@@ -1,4 +1,4 @@
-from .downscale_image_threshold import DownscaleImageThreshold
+from .resize_image import ResizeImage
 from .reset_resolution_by_longer_edge import ResetResolutionByLongerEdge
 from .load_image_index import LoadImageIndex
 from .prompt_selector import PromptSelector
@@ -7,7 +7,7 @@ from .count_files import CountFiles
 
 # （必填）填写 import 的类名称，key 需要全局唯一
 NODE_CLASS_MAPPINGS = {
-    "DownscaleImageThreshold": DownscaleImageThreshold,
+    "ResizeImage": ResizeImage,
     "ResetResolutionByLongerEdge": ResetResolutionByLongerEdge,
     "LoadImageIndex": LoadImageIndex,
     "PromptSelector": PromptSelector,
@@ -17,7 +17,7 @@ NODE_CLASS_MAPPINGS = {
 
 # （可不写）UI 界面显示名称
 NODE_DISPLAY_NAME_MAPPINGS = {
-    "DownscaleImageThreshold": "Downscale Image (threshold)",
+    "ResizeImage": "Resize Image",
     "ResetResolutionByLongerEdge": "Reset Resolution by Longer Edge",
     "LoadImageIndex": "Load Image (index)",
     "PromptSelector": "Prompt Selector",

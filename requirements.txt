@@ -11,5 +11,5 @@
 # 节点中使用了 PIL       -> 不添加（ComfyUI 自带）
 # 节点中使用了 requests  -> 添加 requests
 
-# downscale_image_threshold.py
+# resize_image.py
 opencv-python

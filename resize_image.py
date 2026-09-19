@@ -1,8 +1,7 @@
-"""Downscale Image (threshold)
+"""Resize Image
 
-接受大尺寸图片，将其等比缩小至指定长边和短边尺寸；未超过指定尺寸的图片原样输出。
+无论输入图片大小，均等比缩放至指定画布尺寸；不足区域以边缘像素扩展填充并模糊化，实现平滑自然的过渡效果。
 横图以 long 为宽、short 为高，竖图以 short 为宽、long 为高。
-缩小后不足画布的区域以边缘像素扩展填充并模糊化，实现平滑自然的过渡效果。
 """
 
 import cv2
@@ -10,7 +9,7 @@ import numpy as np
 import torch
 
 
-class DownscaleImageThreshold:
+class ResizeImage:
     def __init__(self):
         pass
 
@@ -32,7 +31,6 @@ class DownscaleImageThreshold:
     FUNCTION = "process"
 
     def process(self, image, long, short):
-        # 阈值判断：宽高均未超出目标尺寸，原样返回，不做转换避免精度损失
         h, w = image.shape[1], image.shape[2]
         # 根据图片宽高对比决定目标尺寸：宽>高为横图，宽<高为竖图
         if w > h:
@@ -40,14 +38,11 @@ class DownscaleImageThreshold:
         else:
             target_w, target_h = short, long
 
-        if w <= target_w and h <= target_h:
-            return (image, w, h)
-
         # tensor [0,1] float32 -> numpy uint8
         img = np.clip(255. * image[0].cpu().numpy(), 0, 255).astype(np.uint8)
         h, w = img.shape[:2]
 
-        # 等比缩小以完整放入目标画布
+        # 等比缩放以完整放入目标画布
         scale = min(target_w / w, target_h / h)
         new_w = int(round(w * scale))
         new_h = int(round(h * scale))
@@ -97,5 +92,5 @@ class DownscaleImageThreshold:
         return torch.from_numpy(img.astype(np.float32) / 255.0).unsqueeze(0)
 
 
-NODE_CLASS_MAPPINGS = {"DownscaleImageThreshold": DownscaleImageThreshold}
-NODE_DISPLAY_NAME_MAPPINGS = {"DownscaleImageThreshold": "Downscale Image (threshold)"}
+NODE_CLASS_MAPPINGS = {"ResizeImage": ResizeImage}
+NODE_DISPLAY_NAME_MAPPINGS = {"ResizeImage": "Resize Image"}
